@@ -1,18 +1,14 @@
 {
   inputs = {
-    nixpkgs_.url = "github:br4ch1st0chr0n3/flakes?dir=source-flake/nixpkgs";
-    nixpkgs.follows = "nixpkgs_/nixpkgs";
-    flake-utils_.url = "github:br4ch1st0chr0n3/flakes?dir=source-flake/flake-utils";
-    flake-utils.follows = "flake-utils_/flake-utils";
     my-codium.url = "github:br4ch1st0chr0n3/flakes?dir=codium";
-    drv-tools.url = "github:br4ch1st0chr0n3/flakes?dir=drv-tools";
+    nixpkgs.follows = "my-codium/nixpkgs";
+    flake-utils.follows = "my-codium/flake-utils";
+    drv-tools.follows = "my-codium/drv-tools";
+    my-devshell.follows = "my-codium/my-devshell";
     flake-tools.url = "github:br4ch1st0chr0n3/flakes?dir=flake-tools";
-    haskell-tools.url = "github:br4ch1st0chr0n3/flakes?dir=language-tools/haskell";
     manager.url = "github:br4ch1st0chr0n3/flakes?dir=manager";
-    flake-compat = {
-      url = "github:edolstra/flake-compat";
-      flake = false;
-    };
+    haskell-tools.follows = "manager/haskell-tools";
+    flake-compat.follows = "manager/flake-compat";
   };
   outputs =
     { self
@@ -23,6 +19,7 @@
     , haskell-tools
     , flake-tools
     , manager
+    , my-devshell
     , ...
     }:
     flake-utils.lib.eachDefaultSystem (system:
@@ -32,12 +29,11 @@
         writeSettingsJSON
         mkCodium
         ;
-      devshells = my-codium.functions.${system};
       inherit (my-codium.configs.${system})
         extensions
         settingsNix
         ;
-      devshell = my-codium.devshell.${system};
+      devshell = my-devshell.devshell.${system};
       inherit (flake-tools.functions.${system})
         mkFlakesUtils
         ;
